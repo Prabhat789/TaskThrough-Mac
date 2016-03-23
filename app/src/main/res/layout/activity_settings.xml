@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/application_tool_bar"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <EditText
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:hint="Enter Remote Url"
+            android:id="@+id/editUrl"
+            android:singleLine="true"
+            android:layout_marginTop="100dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <Button
+            android:layout_width="250dp"
+            android:layout_height="45dp"
+            android:text="Save"
+            android:id="@+id/btnSaveUrl"
+            android:layout_marginTop="15dp"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:visibility="visible"
+        android:orientation="vertical"
+        android:layout_marginTop="50dp"
+        android:id="@+id/llNoInternet">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_internet_text"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="0.30"
+            android:background="@color/parse_blue"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:id="@+id/btnAppointment"
+            android:text="Appointment"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="0.22"
+            android:background="@color/parse_blue"
+            android:textAllCaps="false"
+            android:layout_marginLeft="5dp"
+            android:textColor="@android:color/white"
+            android:id="@+id/btnTask"
+            android:text="Task"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="0.24"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@color/parse_blue"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:id="@+id/btnCommute"
+            android:text="Commute"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="0.22"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:background="@color/parse_blue"
+            android:id="@+id/btnBreak"
+            android:text="Break"/>
+
+    </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/llInternet">
+
+        <WebView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/webView">
+
+        </WebView>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Task Thru</string>
+    <string name="title_activity_login">Map</string>
+    <string name="action_settings">Setting</string>
+    <string name="invalid_username">Enter valid username</string>
+    <string name="invalid_password">Enter valid password</string>
+    <string name="no_internet">No Internet</string>
+    <string name="processing">Please wait...</string>
+    <string name="unable_to_process_tequest">Unable to process your request, please try again !</string>
+    <string name="no_internet_text">Offline Mode - Due to lack of proper internet connectivity, you are currently accessing the offline mode</string>
+
+</resources>
