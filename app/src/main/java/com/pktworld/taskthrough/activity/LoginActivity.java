@@ -3,9 +3,12 @@ package com.pktworld.taskthrough.activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,20 +16,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.pktworld.taskthrough.R;
-import com.pktworld.taskthrough.utils.CallService;
+import com.pktworld.taskthrough.model.LoginResponse;
 import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.GsonRequestResponseHelper;
+import com.pktworld.taskthrough.utils.UrlString;
 import com.pktworld.taskthrough.utils.Utils;
 
-import org.apache.http.Header;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements OnMapReadyCallback ,View.OnClickListener{
 
@@ -37,6 +46,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
     private ProgressDialog mProgressDialog;
     private int doneId;
     private Globals glo;
+    private RequestQueue mRequestQueue;
 
 
     @Override
@@ -86,9 +96,12 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
 
         mMap.setBuildingsEnabled(true);
         LatLng sydney = new LatLng(Double.parseDouble(glo.getLatitude()),Double.parseDouble(glo.getLongitude()));
-        mMap.addMarker(new MarkerOptions().position(sydney).
+        mMap.addMarker(new MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.
+                fromBitmap(resizeMapIcons("ic_marker_50", 70, 70))).
                 title(Utils.getAddress(Double.parseDouble(glo.getLatitude()), Double.parseDouble(glo.getLongitude()), LoginActivity.this)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(sydney.latitude, sydney.longitude), 14));
+
     }
 
     @Override
@@ -115,7 +128,8 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
         if (v == btnLogin){
             if (validate()){
                 if (Utils.isConnected(LoginActivity.this)){
-                    login(LoginActivity.this,editUsername.getText().toString(),editPassword.getText().toString());
+                    login(LoginActivity.this,"userjson.asmx/SetUserLogin",
+                            editUsername.getText().toString(),editPassword.getText().toString());
                 }
             }
 
@@ -137,138 +151,86 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
 
     }
 
-    void login(final Context mContext, final String username, final String password){
-        final RequestParams requestParams = new RequestParams();
+
+    private void login(Context mContext, String url, String userId, String Password) {
         mProgressDialog = ProgressDialog.show(mContext, "",
                 getResources().getString(R.string.processing), true);
         mProgressDialog.show();
-        final String Url = "http://"+glo.getRemoteUrl()+"/webservice.asmx/LoginValidation?"
-                + "UserName="+username
-                + "&Password="+password;
-        System.out.println("URL "+Url);
-        CallService.get(Url, requestParams, new AsyncHttpResponseHandler() {
+        String REQUEST_URL = UrlString.BASE_URL+url;
+        Map<String,String> params = new HashMap<String, String>();
+        params.put("lsEmail", userId);
+        params.put("lsPassword", Password);
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                // TODO Auto-generated method stub
-                if (mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
+        mRequestQueue = Volley.newRequestQueue(mContext);
 
-                System.out.println("DataResponse: Success");
-                String response = CallService.getResponse(TAG, "sendDataToWebsite - success", Url, requestParams, responseBody, headers, statusCode, null);
-                try {
-                    if (statusCode == 200){
-
-                        glo.setUserName(username);
-                        glo.setUserPassword(password);
-                        Intent i = new Intent(mContext,HomeActivity.class);
-                        startActivity(i);
-                    }
+        // Request with API parameters
+        GsonRequestResponseHelper<LoginResponse> myReq = new GsonRequestResponseHelper<LoginResponse>(
+                com.android.volley.Request.Method.POST,
+                REQUEST_URL,
+                LoginResponse.class,
+                params,
+                createMyReqSuccessListener(),
+                createMyReqErrorListener());
 
 
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    e.printStackTrace();
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable e) {
-                // TODO Auto-generated method stub
-                if (mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-                System.out.println("DataResponse: Fail");
-                String response = CallService.getResponse(TAG, "sendDataToWebsite - fails", Url, requestParams, responseBody, headers, statusCode, e);
-                System.out.println("DataResponse: " + response);
-            }
-        });
+        mRequestQueue.add(myReq);
     }
 
-    /*private class LoginWebServiceTask extends AsyncTask<Void, Void, Document> {
+    private Response.Listener<LoginResponse> createMyReqSuccessListener() {
+        return new Response.Listener<LoginResponse>() {
+            @Override
+            public void onResponse(LoginResponse response) {
+                try {
+                    if (mProgressDialog.isShowing()){
+                        mProgressDialog.dismiss();
+                    }
 
-        private String userName = null;
-        private String password = null;
-        Context mContext;
+                    if (response.getResponse().equals("Success")){
+                        Log.e(TAG,response.getStaffId());
+                        Log.e(TAG, response.getRedirectUrl());
 
-        LoginWebServiceTask(Context context,String username, String password){
-            this.mContext = context;
-            this.userName = username;
-            this.password = password;
+                        glo.setRedirectUrl(response.getRedirectUrl());
+                        glo.setUserId(response.getStaffId());
 
-        }
+                        Intent i = new Intent(LoginActivity.this,HomeActivity.class);
+                        startActivity(i);
+                        finish();
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressDialog = ProgressDialog.show(mContext, "",
-                    getResources().getString(R.string.processing), true);
-            mProgressDialog.show();
-        }
+                    }else {
+                        Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
+                    }
 
-        @Override
-        protected Document doInBackground(Void... params) {
-            try {
-                String remoteURL = glo.getRemoteUrl();
-                String url = "http://" + remoteURL + "/webservice.asmx/LoginValidation?UserName="
-                        + URLEncoder.encode(userName, "UTF-8")
-                        + "&Password="
-                        + URLEncoder.encode(password, "UTF-8");
-                URI URL = URI.create(url);
-                Log.i("Webservice", URL.toString());
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpResponse response;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (mProgressDialog.isShowing()){
+                        mProgressDialog.dismiss();
+                    }
+                    Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
 
-                response = httpclient.execute(new HttpGet(URL));
-
-                StatusLine statusLine = response.getStatusLine();
-                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    response.getEntity().writeTo(out);
-                    out.close();
-
-                    String responseString = out.toString();
-                    Log.i("Webservice",responseString);
-                    Document doc = XMLfromString(responseString);
-                    return doc;
-                } else {
-                    // Closes the connection.
-                    response.getEntity().getContent().close();
+                    Log.e(TAG, "TryCatch");
                 }
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return null;
-        }
+            };
+        };
+    }
 
-        protected void onPostExecute(Document doc) {
-            progressDialog.dismiss();
-            if (doc == null) {
-                showAlert("Network error occured please try again later");
-            } else {
-                doc.getDocumentElement().normalize();
-                Element root = doc.getDocumentElement();
-                NodeList nodeList = root.getElementsByTagName("Authentication");
-                if (nodeList.item(0).getFirstChild().getNodeValue()
-                        .equalsIgnoreCase("true")) {
-                    NodeList staffList = root.getElementsByTagName("StaffId");
-                    TaskThroughApp.getInstance().setStaffId(staffList.item(0).getFirstChild().getNodeValue());
-
-                    new PushNotifTask().execute();
-
-                } else {
-                    showAlert("Authentication Failed");
-                }
+    private Response.ErrorListener createMyReqErrorListener() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (mProgressDialog.isShowing()){
+                    mProgressDialog.dismiss();
+                } Log.e(TAG, "Error");
+                Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
 
             }
-        }
+        };
+    }
 
-    }*/
+    public Bitmap resizeMapIcons(String iconName,int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
+    }
+
+
 }

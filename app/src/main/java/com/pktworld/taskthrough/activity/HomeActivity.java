@@ -24,6 +24,11 @@ public class HomeActivity extends AppCompatActivity {
         llInternet = (LinearLayout)findViewById(R.id.llInternet);
         llNoInternet = (LinearLayout)findViewById(R.id.llNoInternet);
 
+
+    }
+
+    @Override
+    protected void onResume() {
         if (Utils.isConnected(this)){
             llInternet.setVisibility(View.VISIBLE);
             llNoInternet.setVisibility(View.GONE);
@@ -31,5 +36,6 @@ public class HomeActivity extends AppCompatActivity {
             llNoInternet.setVisibility(View.VISIBLE);
             llInternet.setVisibility(View.GONE);
         }
+        super.onResume();
     }
 }

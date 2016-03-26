@@ -28,6 +28,7 @@ public class Globals {
     private static final String USER_EMAIL = "USER_EMAIL";
     private static final String USER_PASSWORD = "USER_PASSWORD";
     private static final String REMOTE_URL = "REMOTE_URL";
+    private static final String REDIRECT_URL = "REDIRECT_URL";
     private static final String LATITUDE = "LATITUDE";
     private static final String LONGITUDE = "LONGITUDE";
 
@@ -75,7 +76,15 @@ public class Globals {
         editor.commit();
     }
     public String getRemoteUrl() {
-        return sharedPref.getString(REMOTE_URL, "www.taskthrough.com");
+        return sharedPref.getString(REMOTE_URL, "http://jibymap.vacationdealsworld.com/");
+    }
+
+    public void setRedirectUrl(String status) {
+        editor.putString(REDIRECT_URL, status);
+        editor.commit();
+    }
+    public String getRedirectUrl() {
+        return sharedPref.getString(REDIRECT_URL, "");
     }
 
     public void setLatitude(String status) {
