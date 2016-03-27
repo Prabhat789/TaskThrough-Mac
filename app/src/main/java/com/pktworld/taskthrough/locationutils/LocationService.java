@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -16,9 +17,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.pktworld.taskthrough.db.DatabaseModel;
+import com.pktworld.taskthrough.db.TaskThruDatabase;
 import com.pktworld.taskthrough.utils.Globals;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -37,6 +41,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
     private Globals glo;
+    private TaskThruDatabase db;
 
 
     @Override
@@ -61,6 +66,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             Log.e("Longitude", "" + mCurrentLocation.getLongitude());
             glo.setLatitude(Double.toString(mCurrentLocation.getLatitude()));
             glo.setLongitude(Double.toString(mCurrentLocation.getLongitude()));
+            String currentDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+            db.addLocation(new DatabaseModel(glo.getLatitude(),glo.getLongitude(),currentDate));
+            Toast.makeText(LocationService.this,"Location Count is : "+db.getLocationCount(),Toast.LENGTH_SHORT).show();;
             stopLocationUpdates();
             stopSelf();
 
@@ -150,6 +158,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public void onCreate() {
         super.onCreate();
         glo =  new Globals(this);
+        db = new TaskThruDatabase(this);
         buildGoogleApiClient();
 
     }
