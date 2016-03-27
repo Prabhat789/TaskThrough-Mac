@@ -15,6 +15,8 @@ import android.widget.Toast;
 import com.pktworld.taskthrough.R;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,6 +44,10 @@ public class Utils {
             return false;
         }
 
+    }
+    public static String getCurrentTime(){
+        String currentDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+        return currentDate;
     }
 
 

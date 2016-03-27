@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 import com.pktworld.taskthrough.db.DatabaseModel;
 import com.pktworld.taskthrough.db.TaskThruDatabase;
 import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.Utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -66,8 +67,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             Log.e("Longitude", "" + mCurrentLocation.getLongitude());
             glo.setLatitude(Double.toString(mCurrentLocation.getLatitude()));
             glo.setLongitude(Double.toString(mCurrentLocation.getLongitude()));
-            String currentDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-            db.addLocation(new DatabaseModel(glo.getLatitude(),glo.getLongitude(),currentDate));
+
+            db.addLocation(new DatabaseModel(glo.getLatitude(),glo.getLongitude(), Utils.getCurrentTime()));
             Toast.makeText(LocationService.this,"Location Count is : "+db.getLocationCount(),Toast.LENGTH_SHORT).show();;
             stopLocationUpdates();
             stopSelf();

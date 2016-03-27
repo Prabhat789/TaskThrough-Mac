@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class TaskThruDatabase extends SQLiteOpenHelper {
         values.put(STAFF_ID, conModel.getStaffId());
         values.put(TITLE, conModel.getTitle());
         values.put(REVIEW, conModel.getReview());
+        values.put(LATITUDE, conModel.getLatitude());
         values.put(LONGITUDE, conModel.getLongitude());
         values.put(UPLOAD_FLAG, conModel.getUpladFlag());
         values.put(DATE_TIME, conModel.getDateTime());
@@ -85,7 +87,7 @@ public class TaskThruDatabase extends SQLiteOpenHelper {
         values.put(LONGITUDE, conModel.getLongitude());
         values.put(DATE_TIME, conModel.getDateTime());
         db.insert(TABLE_LOCATION, null, values);
-        Log.v(TAG,values.toString());
+        Log.v(TAG, values.toString());
         db.close();
 
     }
@@ -115,6 +117,37 @@ public class TaskThruDatabase extends SQLiteOpenHelper {
         // return contact list
         cursor.close();
         return Location;
+
+    }
+    /*Get Task*/
+    public List<DatabaseModel> getAllTask() {
+        // TODO Auto-generated method stub
+        List<DatabaseModel> task = new ArrayList<DatabaseModel>();
+        String selectQuery = "SELECT * FROM " + TABLE_TASK;
+        // String selectQuery = "SELECT * FROM " + TABLE_IMAGES+" WHERE "+UPLOAD_FLAG+ "
+        // LIKE"+"'false'"+" ORDER BY Id DESC LIMIT 1";
+
+        SQLiteDatabase adb = this.getWritableDatabase();
+        Cursor cursor = adb.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                DatabaseModel contact = new DatabaseModel();
+                contact.setId(Integer.parseInt(cursor.getString(0)));
+                contact.setStaffId(cursor.getString(1));
+                contact.setTitle(cursor.getString(2));
+                contact.setReview(cursor.getString(3));
+                contact.setLatitude(cursor.getString(4));
+                contact.setLongitude(cursor.getString(5));
+                contact.setUpladFlag(cursor.getString(6));
+                contact.setDateTime(cursor.getString(7));
+                // Adding contact to list
+                task.add(contact);
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        cursor.close();
+        return task;
 
     }
     public int getLocationCount() {

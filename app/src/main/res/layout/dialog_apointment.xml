@@ -32,7 +32,8 @@
         android:layout_marginBottom="10dp"
         android:textSize="@dimen/small_text"
         android:textColor="@color/dark_grey"
-        android:background="@drawable/edit_rounded_corner_smoke_white"/>
+        android:background="@drawable/edit_rounded_corner_smoke_white"
+        android:id="@+id/editTitle" />
 
     <EditText
         android:layout_width="match_parent"
@@ -46,7 +47,8 @@
         android:textSize="@dimen/small_text"
         android:textColor="@color/dark_grey"
         android:gravity="start"
-        android:background="@drawable/edit_rounded_corner_smoke_white"/>
+        android:background="@drawable/edit_rounded_corner_smoke_white"
+        android:id="@+id/editReview" />
 
     <Button
         android:layout_width="match_parent"

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@color/smoke_white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,12 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:textColor="@color/dark_grey"
             android:text="@string/no_internet_text"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         >
@@ -69,6 +70,17 @@
             android:text="Break"/>
 
     </LinearLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listTask"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="7dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="15dp">
+
+        </ListView>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

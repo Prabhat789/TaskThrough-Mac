@@ -2,6 +2,7 @@ package com.pktworld.taskthrough.activity;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -9,11 +10,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pktworld.taskthrough.R;
+import com.pktworld.taskthrough.adapter.TaskAdapter;
+import com.pktworld.taskthrough.db.DatabaseModel;
+import com.pktworld.taskthrough.db.TaskThruDatabase;
+import com.pktworld.taskthrough.utils.Globals;
 import com.pktworld.taskthrough.utils.Utils;
+
+import java.util.List;
 
 /**
  * Created by Prabhat on 12/03/16.
@@ -23,15 +33,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = HomeActivity.class.getSimpleName();
     private LinearLayout llInternet, llNoInternet;
     private Button btnAppointment;
+    private ListView listTask;
+    private TaskThruDatabase db;
+    private TaskAdapter mAdapter;
+    private Globals glo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        glo = new Globals(this);
+        if (glo.getUserId().toString() == null){
+            Intent i = new Intent(HomeActivity.this, LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+        }
+        db = new TaskThruDatabase(this);
         llInternet = (LinearLayout)findViewById(R.id.llInternet);
         llNoInternet = (LinearLayout)findViewById(R.id.llNoInternet);
         btnAppointment = (Button)findViewById(R.id.btnAppointment);
+
+        listTask = (ListView)findViewById(R.id.listTask);
         btnAppointment.setOnClickListener(this);
 
 
@@ -45,11 +67,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }else{
             llNoInternet.setVisibility(View.VISIBLE);
             llInternet.setVisibility(View.GONE);
+            getAllTaskAndShowInList();
         }
         super.onResume();
     }
 
-    void showClassDialog(Context mContext, String title){
+    void showClassDialog(final Context mContext, String title){
 
         final Dialog gameOver = new Dialog(mContext);
         gameOver.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -58,7 +81,32 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         gameOver.setContentView(R.layout.dialog_apointment);
         TextView txtTitle = (TextView)gameOver.findViewById(R.id.txtTitleDialog);
         txtTitle.setText(title);
+        gameOver.setCancelable(true);
 
+        final EditText editTitle = (EditText)gameOver.findViewById(R.id.editTitle);
+        final EditText editReview = (EditText)gameOver.findViewById(R.id.editReview);
+        Button btnSave = (Button)gameOver.findViewById(R.id.btnDialogSave);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editTitle.getText().toString().trim().isEmpty()
+                        || editTitle.getText().toString().trim().length() == 0){
+                    Toast.makeText(mContext,"Please Enter Title",Toast.LENGTH_LONG).show();
+                }else if (editReview.getText().toString().trim().isEmpty()
+                        || editReview.getText().toString().trim().length() == 0){
+                    Toast.makeText(mContext,"Please Enter Review",Toast.LENGTH_LONG).show();
+                }
+                else {
+                    db.addTask(new DatabaseModel(glo.getUserId(),editTitle.getText().toString(),
+                            editReview.getText().toString(),glo.getLatitude(),glo.getLongitude(),
+                            "false",Utils.getCurrentTime()));
+                    getAllTaskAndShowInList();
+                    gameOver.dismiss();
+                }
+
+            }
+        });
 
         gameOver.show();
 
@@ -69,5 +117,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (v == btnAppointment){
             showClassDialog(HomeActivity.this,"Appointment");
         }
+    }
+
+    void getAllTaskAndShowInList(){
+        List<DatabaseModel> ScannList = db.getAllTask();
+        mAdapter = new TaskAdapter(HomeActivity.this,ScannList);
+        listTask.setAdapter(mAdapter);
     }
 }

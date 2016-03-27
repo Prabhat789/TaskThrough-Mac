@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
 
             public void run() {
                 // TODO Auto-generated method stub
-                    Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+                    Intent i = new Intent(SplashActivity.this, HomeActivity.class);
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(i);
 

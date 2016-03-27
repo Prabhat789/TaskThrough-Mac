@@ -193,8 +193,8 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
                         glo.setUserId(response.getStaffId());
 
                         Intent i = new Intent(LoginActivity.this,HomeActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
-                        finish();
 
                     }else {
                         Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
