@@ -5,5 +5,5 @@ package com.pktworld.taskthrough.utils;
  */
 public class UrlString {
 
-    public static final String BASE_URL = "http://jibymap.vacationdealsworld.com/";
+    //public static final String BASE_URL = "http://jibymap.vacationdealsworld.com/";
 }

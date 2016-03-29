@@ -31,7 +31,6 @@ import com.pktworld.taskthrough.R;
 import com.pktworld.taskthrough.model.LoginResponse;
 import com.pktworld.taskthrough.utils.Globals;
 import com.pktworld.taskthrough.utils.GsonRequestResponseHelper;
-import com.pktworld.taskthrough.utils.UrlString;
 import com.pktworld.taskthrough.utils.Utils;
 
 import java.util.HashMap;
@@ -156,7 +155,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
         mProgressDialog = ProgressDialog.show(mContext, "",
                 getResources().getString(R.string.processing), true);
         mProgressDialog.show();
-        String REQUEST_URL = UrlString.BASE_URL+url;
+        String REQUEST_URL = glo.getRemoteUrl()+url;
         Map<String,String> params = new HashMap<String, String>();
         params.put("lsEmail", userId);
         params.put("lsPassword", Password);

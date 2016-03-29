@@ -76,7 +76,7 @@ public class Globals {
         editor.commit();
     }
     public String getRemoteUrl() {
-        return sharedPref.getString(REMOTE_URL, "http://jibymap.vacationdealsworld.com/");
+        return sharedPref.getString(REMOTE_URL, "http://mapview.vacationdealsworld.com/");
     }
 
     public void setRedirectUrl(String status) {

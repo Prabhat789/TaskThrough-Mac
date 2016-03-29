@@ -20,9 +20,12 @@ import com.pktworld.taskthrough.R;
 import com.pktworld.taskthrough.adapter.TaskAdapter;
 import com.pktworld.taskthrough.db.DatabaseModel;
 import com.pktworld.taskthrough.db.TaskThruDatabase;
+import com.pktworld.taskthrough.utils.ApplicationConstant;
 import com.pktworld.taskthrough.utils.Globals;
 import com.pktworld.taskthrough.utils.Utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,10 +46,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         glo = new Globals(this);
-        if (glo.getUserId().toString() == null){
+        if (glo.getUserId().toString().length() == 0){
             Intent i = new Intent(HomeActivity.this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
+        }
+        if (isLycenceExpire()){
+            finish();
         }
         db = new TaskThruDatabase(this);
         llInternet = (LinearLayout)findViewById(R.id.llInternet);
@@ -123,5 +129,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         List<DatabaseModel> ScannList = db.getAllTask();
         mAdapter = new TaskAdapter(HomeActivity.this,ScannList);
         listTask.setAdapter(mAdapter);
+    }
+
+    private boolean isLycenceExpire(){
+        String currentDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+        int dayCount = Utils.get_count_of_days(currentDate, ApplicationConstant.EXPIRED_DATE);
+        if (dayCount == 0){
+            Toast.makeText(HomeActivity.this, "Licence Expired !",Toast.LENGTH_SHORT).show();
+            return true;
+        }else {
+            return false;
+        }
     }
 }

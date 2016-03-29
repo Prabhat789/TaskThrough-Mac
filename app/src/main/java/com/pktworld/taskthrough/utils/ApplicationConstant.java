@@ -8,5 +8,6 @@ public class ApplicationConstant {
     public static final String APPLICATION_PREFERENCE_NAME = PACKAGE_NAME+".preference";
     public static final String INTERVAL_IN_MINUTES = "intervalInMinutes";
     public static final int INTERVAL_TIME = 20;
+    public static final String EXPIRED_DATE = "01/04/2016";
 
 }
