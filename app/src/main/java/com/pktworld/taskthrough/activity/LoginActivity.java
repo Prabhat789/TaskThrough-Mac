@@ -31,6 +31,7 @@ import com.pktworld.taskthrough.R;
 import com.pktworld.taskthrough.model.LoginResponse;
 import com.pktworld.taskthrough.utils.Globals;
 import com.pktworld.taskthrough.utils.GsonRequestResponseHelper;
+import com.pktworld.taskthrough.utils.UrlString;
 import com.pktworld.taskthrough.utils.Utils;
 
 import java.util.HashMap;
@@ -155,7 +156,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
         mProgressDialog = ProgressDialog.show(mContext, "",
                 getResources().getString(R.string.processing), true);
         mProgressDialog.show();
-        String REQUEST_URL = glo.getRemoteUrl()+url;
+        String REQUEST_URL = UrlString.BASE_URL+url;
         Map<String,String> params = new HashMap<String, String>();
         params.put("lsEmail", userId);
         params.put("lsPassword", Password);
@@ -179,11 +180,10 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
         return new Response.Listener<LoginResponse>() {
             @Override
             public void onResponse(LoginResponse response) {
+                if (mProgressDialog.isShowing()){
+                    mProgressDialog.dismiss();
+                }
                 try {
-                    if (mProgressDialog.isShowing()){
-                        mProgressDialog.dismiss();
-                    }
-
                     if (response.getResponse().equals("Success")){
                         Log.e(TAG,response.getStaffId());
                         Log.e(TAG, response.getRedirectUrl());
@@ -196,16 +196,14 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
                         startActivity(i);
 
                     }else {
-                        Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
+                        Utils.showToastMessage(LoginActivity.this,
+                                getString(R.string.unable_to_process_tequest));
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    if (mProgressDialog.isShowing()){
-                        mProgressDialog.dismiss();
-                    }
-                    Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
-
+                    Utils.showToastMessage(LoginActivity.this,
+                            getString(R.string.unable_to_process_tequest));
                     Log.e(TAG, "TryCatch");
                 }
             };
@@ -218,8 +216,10 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
             public void onErrorResponse(VolleyError error) {
                 if (mProgressDialog.isShowing()){
                     mProgressDialog.dismiss();
-                } Log.e(TAG, "Error");
-                Toast.makeText(LoginActivity.this,getString(R.string.unable_to_process_tequest),Toast.LENGTH_SHORT).show();
+                }
+                Utils.showToastMessage(LoginActivity.this,
+                        getString(R.string.unable_to_process_tequest));
+                Log.e(TAG, "Error");
 
             }
         };

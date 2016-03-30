@@ -10,6 +10,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pktworld.taskthrough.R;
@@ -182,5 +185,17 @@ public class Utils {
 
 
         return ((int) dayCount);
+    }
+
+    public static void showToastMessage(Activity mContext, String msg) {
+        LayoutInflater li = mContext.getLayoutInflater();
+        View layout = li.inflate(R.layout.custom_toast, null);
+        TextView txtMsg = (TextView) layout.findViewById(R.id.txtToast);
+        txtMsg.setText(msg);
+        Toast toast = new Toast(mContext);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        // toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 0);
+        toast.setView(layout);
+        toast.show();
     }
 }

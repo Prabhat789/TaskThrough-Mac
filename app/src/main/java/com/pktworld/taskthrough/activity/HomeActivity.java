@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pktworld.taskthrough.R;
 import com.pktworld.taskthrough.adapter.TaskAdapter;
@@ -98,10 +97,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View v) {
                 if (editTitle.getText().toString().trim().isEmpty()
                         || editTitle.getText().toString().trim().length() == 0){
-                    Toast.makeText(mContext,"Please Enter Title",Toast.LENGTH_LONG).show();
+                    Utils.showToastMessage(HomeActivity.this, "Please Enter Title");
                 }else if (editReview.getText().toString().trim().isEmpty()
                         || editReview.getText().toString().trim().length() == 0){
-                    Toast.makeText(mContext,"Please Enter Review",Toast.LENGTH_LONG).show();
+                    Utils.showToastMessage(HomeActivity.this, "Please Enter Review");
                 }
                 else {
                     db.addTask(new DatabaseModel(glo.getUserId(),editTitle.getText().toString(),
@@ -135,7 +134,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String currentDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
         int dayCount = Utils.get_count_of_days(currentDate, ApplicationConstant.EXPIRED_DATE);
         if (dayCount == 0){
-            Toast.makeText(HomeActivity.this, "Licence Expired !",Toast.LENGTH_SHORT).show();
+            Utils.showToastMessage(HomeActivity.this, "Licence Expired !");
             return true;
         }else {
             return false;

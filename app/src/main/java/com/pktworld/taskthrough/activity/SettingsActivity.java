@@ -8,10 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.pktworld.taskthrough.R;
 import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.Utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +50,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 glo.setRemoteUrl(editUrl.getText().toString());
                 finish();
             }else {
-                Toast.makeText(SettingsActivity.this,"Please enter valid URL",Toast.LENGTH_SHORT).show();
+                Utils.showToastMessage(SettingsActivity.this,"Please enter valid Url");
             }
         }
     }
