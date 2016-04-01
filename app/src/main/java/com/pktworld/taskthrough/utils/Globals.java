@@ -1,3 +1,4 @@
+/*
 package com.pktworld.taskthrough.utils;
 
 import android.content.Context;
@@ -76,7 +77,7 @@ public class Globals {
         editor.commit();
     }
     public String getRemoteUrl() {
-        return sharedPref.getString(REMOTE_URL, "http://mapview.vacationdealsworld.com/");
+        return sharedPref.getString(REMOTE_URL, "http://mapweb.vacationdealsworld.com/");
     }
 
     public void setRedirectUrl(String status) {
@@ -105,3 +106,4 @@ public class Globals {
 
 }
 
+*/

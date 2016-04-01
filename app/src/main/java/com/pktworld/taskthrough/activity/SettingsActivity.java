@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.pktworld.taskthrough.R;
-import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.UserSessionManager;
 import com.pktworld.taskthrough.utils.Utils;
 
 import java.util.regex.Matcher;
@@ -23,7 +23,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private static final String TAG = SettingsActivity.class.getSimpleName();
     private EditText editUrl;
     private Button btnSaveUrl;
-    private Globals glo;
+    private UserSessionManager glo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Setting");
 
-        glo = new Globals(SettingsActivity.this);
+        glo = new UserSessionManager(SettingsActivity.this);
         editUrl = (EditText)findViewById(R.id.editUrl);
         btnSaveUrl = (Button)findViewById(R.id.btnSaveUrl);
         btnSaveUrl.setOnClickListener(this);
@@ -47,7 +47,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         if (v == btnSaveUrl){
             if (isUrlValid(editUrl.getText().toString())){
-                glo.setRemoteUrl(editUrl.getText().toString());
+                glo.saveRemoteUrl(editUrl.getText().toString());
                 finish();
             }else {
                 Utils.showToastMessage(SettingsActivity.this,"Please enter valid Url");

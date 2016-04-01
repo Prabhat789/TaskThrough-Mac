@@ -1,14 +1,17 @@
 package com.pktworld.taskthrough.activity;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -20,7 +23,7 @@ import com.pktworld.taskthrough.adapter.TaskAdapter;
 import com.pktworld.taskthrough.db.DatabaseModel;
 import com.pktworld.taskthrough.db.TaskThruDatabase;
 import com.pktworld.taskthrough.utils.ApplicationConstant;
-import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.UserSessionManager;
 import com.pktworld.taskthrough.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -38,18 +41,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private ListView listTask;
     private TaskThruDatabase db;
     private TaskAdapter mAdapter;
-    private Globals glo;
+    private UserSessionManager glo;
+    private WebView webView;
+    private ProgressDialog mProgressDialog;
+    private String userId = null;
+    private String redirectUrl = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        glo = new Globals(this);
-        if (glo.getUserId().toString().length() == 0){
+        glo = new UserSessionManager(this);
+        userId = glo.getUserDetails().get("userid");
+        redirectUrl = glo.getUserDetails().get("redirect_url");
+        /*if (glo.getUserId().toString().length() == 0){
             Intent i = new Intent(HomeActivity.this, LoginActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
-        }
+        }*/
+        glo.checkLogin();
         if (isLycenceExpire()){
             finish();
         }
@@ -57,6 +67,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         llInternet = (LinearLayout)findViewById(R.id.llInternet);
         llNoInternet = (LinearLayout)findViewById(R.id.llNoInternet);
         btnAppointment = (Button)findViewById(R.id.btnAppointment);
+        webView = (WebView)findViewById(R.id.webView);
+        webView.getSettings().setJavaScriptEnabled(true);
+
 
         listTask = (ListView)findViewById(R.id.listTask);
         btnAppointment.setOnClickListener(this);
@@ -69,6 +82,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (Utils.isConnected(this)){
             llInternet.setVisibility(View.VISIBLE);
             llNoInternet.setVisibility(View.GONE);
+            webView.setWebViewClient(new MyWebViewClient());
+                webView.loadUrl(glo.getRemoteUrl()+redirectUrl);
+                mProgressDialog = ProgressDialog.show(HomeActivity.this, "",
+                        getResources().getString(R.string.processing), true);
         }else{
             llNoInternet.setVisibility(View.VISIBLE);
             llInternet.setVisibility(View.GONE);
@@ -103,7 +120,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Utils.showToastMessage(HomeActivity.this, "Please Enter Review");
                 }
                 else {
-                    db.addTask(new DatabaseModel(glo.getUserId(),editTitle.getText().toString(),
+                    db.addTask(new DatabaseModel(userId,editTitle.getText().toString(),
                             editReview.getText().toString(),glo.getLatitude(),glo.getLongitude(),
                             "false",Utils.getCurrentTime()));
                     getAllTaskAndShowInList();
@@ -138,6 +155,32 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }else {
             return false;
+        }
+    }
+
+    private class MyWebViewClient extends WebViewClient {
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+
+            mProgressDialog.show();
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+
+            if (mProgressDialog.isShowing()){
+                mProgressDialog.dismiss();
+            }
+
+            super.onPageFinished(view, url);
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
         }
     }
 }

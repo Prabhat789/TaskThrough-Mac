@@ -187,8 +187,8 @@ public class Utils {
         return ((int) dayCount);
     }
 
-    public static void showToastMessage(Activity mContext, String msg) {
-        LayoutInflater li = mContext.getLayoutInflater();
+    public static void showToastMessage(Context mContext, String msg) {
+        LayoutInflater li = LayoutInflater.from(mContext);
         View layout = li.inflate(R.layout.custom_toast, null);
         TextView txtMsg = (TextView) layout.findViewById(R.id.txtToast);
         txtMsg.setText(msg);

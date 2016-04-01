@@ -1,15 +1,11 @@
 package com.pktworld.taskthrough.locationutils;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -19,11 +15,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.pktworld.taskthrough.db.DatabaseModel;
 import com.pktworld.taskthrough.db.TaskThruDatabase;
-import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.UserSessionManager;
 import com.pktworld.taskthrough.utils.Utils;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -32,7 +27,7 @@ import java.util.Date;
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,LocationListener {
 
-    protected static final String TAG = "LocationService";
+    protected static final String TAG = LocationService.class.getSimpleName();
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
@@ -41,7 +36,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
-    private Globals glo;
+    private UserSessionManager glo;
     private TaskThruDatabase db;
 
 
@@ -63,13 +58,13 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-            Log.e("Latitude",""+mCurrentLocation.getLatitude());
-            Log.e("Longitude", "" + mCurrentLocation.getLongitude());
-            glo.setLatitude(Double.toString(mCurrentLocation.getLatitude()));
-            glo.setLongitude(Double.toString(mCurrentLocation.getLongitude()));
+            /*Log.e("Latitude", "" + mCurrentLocation.getLatitude());
+            Log.e("Longitude", "" + mCurrentLocation.getLongitude());*/
+            glo.saveLatitude(Double.toString(mCurrentLocation.getLatitude()));
+            glo.saveLongitude(Double.toString(mCurrentLocation.getLongitude()));
 
-            db.addLocation(new DatabaseModel(glo.getLatitude(),glo.getLongitude(), Utils.getCurrentTime()));
-            Toast.makeText(LocationService.this,"Location Count is : "+db.getLocationCount(),Toast.LENGTH_SHORT).show();;
+            db.addLocation(new DatabaseModel(glo.getLatitude(), glo.getLongitude(), Utils.getCurrentTime()));
+            Utils.showToastMessage(LocationService.this, "Location Count is : " + db.getLocationCount());
             stopLocationUpdates();
             stopSelf();
 
@@ -158,7 +153,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public void onCreate() {
         super.onCreate();
-        glo =  new Globals(this);
+        glo =  new UserSessionManager(this);
         db = new TaskThruDatabase(this);
         buildGoogleApiClient();
 

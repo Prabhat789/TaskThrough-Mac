@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,9 +28,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.pktworld.taskthrough.R;
 import com.pktworld.taskthrough.model.LoginResponse;
-import com.pktworld.taskthrough.utils.Globals;
+import com.pktworld.taskthrough.utils.ApplicationConstant;
 import com.pktworld.taskthrough.utils.GsonRequestResponseHelper;
 import com.pktworld.taskthrough.utils.UrlString;
+import com.pktworld.taskthrough.utils.UserSessionManager;
 import com.pktworld.taskthrough.utils.Utils;
 
 import java.util.HashMap;
@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
     private EditText editUsername, editPassword;
     private ProgressDialog mProgressDialog;
     private int doneId;
-    private Globals glo;
+    private UserSessionManager glo;
     private RequestQueue mRequestQueue;
 
 
@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
 
         Utils.checkLocationStatus(this);
 
-        glo = new Globals(this);
+        glo = new UserSessionManager(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -67,12 +67,12 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
 
         btnLogin.setOnClickListener(this);
         btnSocialLogin.setOnClickListener(this);
-        try{
+       /* try{
             editPassword.setText(glo.getUserPassword());
             editUsername.setText(glo.getUserName());
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -134,7 +134,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
             }
 
         }else if (v == btnSocialLogin){
-            Toast.makeText(LoginActivity.this,"Work in progress",Toast.LENGTH_SHORT).show();
+            Utils.showToastMessage(LoginActivity.this,"Work in progress");
         }
     }
 
@@ -160,6 +160,13 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
         Map<String,String> params = new HashMap<String, String>();
         params.put("lsEmail", userId);
         params.put("lsPassword", Password);
+        params.put("lsLatitude", glo.getLatitude());
+        params.put("lsLongitude", glo.getLongitude());
+        params.put("lsLocation", Utils.getAddress(Double.parseDouble(glo.getLatitude()),
+                Double.parseDouble(glo.getLongitude()),mContext));
+        params.put("lsDeviceId", ApplicationConstant.DEVICE_ID);
+
+
 
         mRequestQueue = Volley.newRequestQueue(mContext);
 
@@ -187,9 +194,7 @@ public class LoginActivity extends AppCompatActivity implements OnMapReadyCallba
                     if (response.getResponse().equals("Success")){
                         Log.e(TAG,response.getStaffId());
                         Log.e(TAG, response.getRedirectUrl());
-
-                        glo.setRedirectUrl(response.getRedirectUrl());
-                        glo.setUserId(response.getStaffId());
+                        glo.createUserLoginSession(response.getStaffId(),response.getRedirectUrl());
 
                         Intent i = new Intent(LoginActivity.this,HomeActivity.class);
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

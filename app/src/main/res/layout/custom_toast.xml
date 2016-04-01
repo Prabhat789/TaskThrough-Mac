@@ -7,7 +7,7 @@
         android:id="@+id/llToast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/parse_title"
+        android:background="@color/parse_blue"
         android:orientation="vertical"
         android:padding="8dp">
 
